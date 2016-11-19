@@ -4,16 +4,20 @@
 global cells cells_old n x y rulecurr async
 rind=1;
 k=rind;
-randrule=1;
-randrule=0;
+% randrule=1;
+% randrule=0;
 name='nerd';
-loadrule
+% loadrule
+if randrule
 getrule;
+end
 
-n=200;
+n=300;
 x=2:n+1;
 y=2:n+1;
+if randcell
 cells=zeros(n+2,n+2);
+end
 async=0;
 siz=size(cells);
 [x1,x2]=ndgrid(x,y);
@@ -21,9 +25,11 @@ xyid=sub2ind(siz,x1,x2);
 p0=0.5;
 
 %%
-cells=rand(n+2,n+2)*5-2.5;
-%cells=zeros(n+2,n+2);
-% cells(10:15,10:15)=rand(6,6)/2;
+if randcell
+cells=rand(n+2,n+2)*1;
+% cells=zeros(n+2,n+2);
+cells(10:15,10:15)=rand(6,6)/2;
+end
 %
 cells=torus(cells);
 rulecurr=@(a) 1-(mod(100*a,100)/100);
@@ -61,6 +67,20 @@ ef2='eval(f2);';
 % updateFcn=['Sinput(xyid)=eval(f1)./eval(f2);'];
 % updateFcn=['Sinput(xyid)']
 % 'cellsc=cells(xyid)'
+
+if randrule
+[ux,uy]=meshgrid(-1:9,-1:2);
+
+% uz0=uz;
+end
+    uz=((uy==0 & ismember(ux,B) )| uy==1 & ismember(ux,S));
+% uz=rand(size(uz))>0.5;
+uz=single(torus(uz));
+upf=@(a,b) interp2(ux,uy,uz,a,b);
+end
+
+
+
 upf=@(a,b) mod(a,8)+mod(b,1);
 fc='Sinput(xyid)=arrayfun(upf,Sinput(xyid),cells(xyid));';
 fc='Sinput(xyid)=mod(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py,1);';
@@ -71,6 +91,27 @@ updateFcn=[fc];
 
 % px=px(128,1);
 % py=py(1,96);
+% n=60; ex=500;
+% rect=[152,313;
+%       214,350];
+% rect=[365,80;
+%       465,135];
+%   rect=[514,238;
+%       541,252];
+  rect=[207,301;
+      256,312];
+rect=[281,288;
+      320,320];
+rect=[306,302;
+      350,315];
+rect=[1,1;
+      298,298];
+  rect=[132,325;
+      150,326];
+rect=[271,1;
+   500,231];
+% rect=[80,80;160,160];
+% % rect=[350,100;500,250];
 
 % rect=[40,80;
 %       160,81];
@@ -99,15 +140,26 @@ py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
 xlabel('px');
 ylabel('py');
 ax=fi.Parent;
-set(fi.Parent,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
-set(fi.Parent,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
+xlabel(ax,'px');
+ylabel(ax,'py');
+set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
+set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
+set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
+set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
+% cells=gpuArray(cells);
+mvs=zeros(1,stepnum);
+mv=mean(cells(:));
+ck0=eye(n,n);
 
-while stepnum<stepmax
+for stepnum=1:stepmax
     %%
-cold=cells(xyid);
+    pr=rand(n,n);
 cells=floor(div*cells)/div;
-Sinput=conv2(cells,[1 1 1; 1 0 1; 1 1 1],'same');
-% Sinput=(floor(div*Sinput)/div);
+cold=gather(cells);
+
+S_inputold=S_input;
+S_input=conv2(cells,[1 1 1; 1 0 1; 1 1 1],'same');
+Sinput=(floor(div*S_input)/div);
 % cells=rulecurr(Sinput);
 % Sinput(xyid)=eval(f1);
 % Sinput(xyid)=eval(f2);
@@ -115,8 +167,8 @@ eval(updateFcn);
 % Sinput(xyid)=mod(Sinput(xyid),px)./py;
 cells(xyid)=Sinput(xyid);
 cells=torus(cells);
-cellsT=cells(xyid);
-stepnum=stepnum+1;
+cellsT=gather(cells(xyid));
+%stepnum=stepnum+1;
 if mod(stepnum,intl)==0
 set(fi,'CData',cells(xyid)')
 set(h,'Data',cells(xyid))
@@ -133,6 +185,7 @@ tl=sprintf([
 % set(gca,'Title','1')
 title(gca,tl)
 drawnow
+if record
 im=frame2im(getframe(fi.Parent.Parent));
 [imind,cm]=rgb2ind(im,256);
 
@@ -141,12 +194,18 @@ if stepnum==intl;
 else
     imwrite(imind,cm,[gifname '.gif'],'gif','WriteMode','append','DelayTime',0.05);
 end
+end
 pause(0.05)
 % stepnum=stepnum-intl+1;
 end
-
+mvs(stepnum)=gather(mv);
 end
 
 %%
-[min(px(:)) max(px(:));
-  min(py(:)) max(py(:))]'
+figure(6)
+histogram(cells(xyid),linspace(0,0.4,100));
+figure(7);
+plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
+%%
+max
+(px(:)); min(px(:))

@@ -1,6 +1,6 @@
 clear elenum
-clear FIR
 global FIR
+clear FIR
 if ~exist('n','var')
     n=30;
 end
@@ -28,6 +28,7 @@ FIR.S_dinput=2.^[0 1 2;3 8 4;5 6 7];
 FIR.S_dinput(FIR.S_dinput<1)=0;
 FIR.dm=elenum.S_pop.^reshape(0:dm^2-1,dm,dm);
 FIR.Sinput=FIR.S_input;
+
 
 elenum.S_input=sum(FIR.S_input(:))+1;
 elenum.S_pop2input=(elenum.S_pop-1)+(elenum.S_input-1)*elenum.S_pop+1;

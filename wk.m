@@ -11,6 +11,7 @@ siz=size(cells);
 [x1,x2]=ndgrid(x,y);
 xyid=sub2ind(siz,x1,x2);
 n3=floor(n/3);
+
 ix=n3:2*n3;
 cellid=1:numel(cells);
 border=cellid(~ismember(cellid,xyid));

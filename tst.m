@@ -5,12 +5,13 @@ hiddennum = 256;
 inputnum = 16;
 
 inputdata = rand(datanum, inputnum,inputnum);
-outputdata=convn(inputdata,shiftdim(FIR.Sinput,-1),'valid');
-inputdata=reshape(inputdata,datanum,[]);
-outputdata=reshape(outputdata,datanum,[]);
-inputnum=size(inputdata,2);
-outputnum=size(outputdata,2);
-% outputdata = rand(datanum, outputnum);
+% outputdata=convn(inputdata,shiftdim(FIR.Sinput,-1),'valid');
+% inputdata=reshape(inputdata,datanum,[]);
+% outputdata=reshape(outputdata,datanum,[]);
+% inputnum=size(inputdata,2);
+% outputnum=size(outputdata,2);
+inputdata=rand(datanum,inputnum);
+outputdata = rand(datanum, outputnum);
 
 dbn = randDBN([inputnum, outputnum]);
 dbn = pretrainDBN( dbn, inputdata );

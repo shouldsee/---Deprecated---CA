@@ -1,9 +1,10 @@
 function [ cells] = torus( cells )
 global x y
-cells(1,:)=cells(x(numel(x)),:);
-cells(end,:)=cells(x(1),:);
-cells(:,1)=cells(:,y(numel(y)));
-cells(:,end)=cells(:,y(1)); 
+[a,b]=size(cells);
+cells(1,:)=cells(a-1,:);
+cells(end,:)=cells(2,:);
+cells(:,1)=cells(:,b-1);
+cells(:,end)=cells(:,2); 
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
