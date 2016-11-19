@@ -1,7 +1,19 @@
 
 %%
+if ~exist('randrule','var')
+    randrule=0;
+end
+if ~exist('randcell','var')
+    randcell=1;
+end
+if ~exist('record','var')
+    record=1;
+end
+if ~exist('gifname','var')
+    gifname='gif';
+end
 
-global cells cells_old n x y rulecurr async
+global cells cells_old n x y rulecurr async px py
 rind=1;
 k=rind;
 % randrule=1;
@@ -77,7 +89,7 @@ if randrule
 [ux,uy]=meshgrid(-1:9,-1:2);
 
 % uz0=uz;
-end
+
     uz=((uy==0 & ismember(ux,B) )| uy==1 & ismember(ux,S));
 % uz=rand(size(uz))>0.5;
 uz=single(torus(uz));
@@ -144,8 +156,7 @@ rect=[271,1;
 
 rect=[300,140;329,155];
 rect=[163,60;164,60];
-px=repmat(linspace(px(rect(1,1),1),px(rect(2,1),1),n)',1,n);
-py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
+
 % rect=[193,209;194,210];
 % rect=[200,96;200,96];
 % rect=[51,64;126,121];
@@ -195,7 +206,7 @@ for stepnum=1:stepmax
     %%
     pr=rand(n,n);
 cells=floor(div*cells)/div;
-cold=gather(cells);
+cold=gather(cells(xyid));
 
 S_inputold=S_input;
 S_input=conv2(cells,fir,'same');
