@@ -10,15 +10,13 @@ if ~exist('record','var')
     record=1;
 end
 if ~exist('gifname','var')
-    gifname='gif';
+    gif ~exist ('crg','var')
+crg=[-1 1]*1;
+endifname='gif';
 end
 if ~exist ('crg','var')
-    crg=[-1 1]*1;
+crg=[-1 1]*1;
 end
-if ~exist('ex','var')
-ex=15;
-end
-
 global cells cells_old n x y rulecurr async px py
 rind=1;
 k=rind;
@@ -44,7 +42,7 @@ p0=0.5;
 
 %%
 if randcell
-cells=rand(n+2,n+2)*ex;
+cells=rand(n+2,n+2)*1;
 % cells=zeros(n+2,n+2);
 cells(10:15,10:15)=rand(6,6)/2;
 end
@@ -66,6 +64,9 @@ h2=histogram2(cells(xyid),cells(xyid),edge,edge);
 view(30,30);
 zlim([10,2000]);
 set(gca,'ZScale','log')
+if ~exist('ex','var')
+ex=15;
+end
 
 px=linspace(-ex,ex,n+2);
 py=linspace(-ex,ex,n+2);
@@ -113,16 +114,11 @@ end
 if ~exist('mod2','var')
     mod2=1;
 end
-py=py/mod1*mod2;
-% py=-px./((mod1-mod2/2)).*(mod2)+py./ex.*px./ex/0.2;
-% py=-px./(mod1-1).*(mod2);
+% py=-px./mod1.*(mod2)+py./30.*px./100;
+% py=-px./mod1.*(mod2);
 % rect=[30,224;
 %       30,227]; %bb-mosa interface
 % zoomin([30,224;30,227])
-% zoomin([15,207;32,221])
-% zoomin([90,283;96,290])
-% zoomin([107,308;122,322])
-% zoomin([86,326;92,332])
 
 % rect=[100,180;
 %       103,215]; %bb-mosa interface
@@ -212,14 +208,14 @@ set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
 mvs=zeros(1,stepnum);
 mv=mean(cells(:));
 ck0=eye(n,n);
-figure(1)
+
 for stepnum=1:stepmax
     %%
     pr=rand(n,n);
 cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
 
-% S_inputold=S_input;
+S_inputold=S_input;
 Sinput=conv2(cells,fir,'same');
 S_input=Sinput(xyid);
 Sinput=(floor(div*Sinput)/div);
@@ -267,11 +263,10 @@ mvs(stepnum)=gather(mv);
 end
 
 %%
-fitted
-% figure(6)
-% histogram(cells(xyid),linspace(0,0.4,100));
-% figure(7);
-% plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
+figure(6)
+histogram(cells(xyid),linspace(0,0.4,100));
+figure(7);
+plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
 %%
 max
 (px(:)); min(px(:))
