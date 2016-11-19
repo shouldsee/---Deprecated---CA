@@ -1,0 +1,10 @@
+##This is a collection of Feng's scripts to analyse the dynamics of cellular automata with a focus on the input entropy
+##Email: shouldsee.gem@gmail.com
+Scripts and their functions:
+
+
+CA_console_opt:  the major emulator
+	restart: reset the parameters to restart a series of emulation
+rp_visual: standalone visualiser of return map and apc profiles, need a input at 'hnolist'.
+	analyse: iterator funcion under rp_visual
+
