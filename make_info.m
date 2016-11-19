@@ -12,7 +12,10 @@
 
 % rec2=[];
 ind_all=(1:size(ndict,3));
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0b5051a839320aefde74927b856227c1d00cfd2f
 inputs=squeeze(convn(ndict,FIR.S_input,'valid'));
 lndicts=char();
 for i=1:512

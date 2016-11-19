@@ -1,0 +1,9 @@
+function[cells]=correct_torus(cells)
+[m,n]=size(cells);
+x=2:m-1;
+y=2:n-1;
+cells(1,:)=cells(x(end),:);
+cells(end,:)=cells(x(1),:);
+cells(:,1)=cells(:,y(end));
+cells(:,end)=cells(:,y(1));
+end
