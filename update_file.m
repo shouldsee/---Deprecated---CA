@@ -1,0 +1,11 @@
+% filename='filtered.xls';
+rulename=table2cell(T(:,1));
+oldfname=[filename '_old.xls'];
+newfname=[filename '.xls'];
+T_old=readtable(oldfname);
+rulename_old=table2cell(T_old(:,1));
+newind=find(~ismember(rulename,rulename_old));
+writetable(T(newind,:),newfname,'Range','A1');
+[~,uind]=unique([rulename_old;rulename]);
+T_all=[T_old;T(:,1)];
+% writetable(T_all(uind,:),newfname,'Range','J1');
