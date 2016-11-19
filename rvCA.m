@@ -10,9 +10,13 @@ if ~exist('record','var')
     record=1;
 end
 if ~exist('gifname','var')
-    gifname='gif';
+    gif ~exist ('crg','var')
+crg=[-1 1]*1;
+endifname='gif';
 end
-
+if ~exist ('crg','var')
+crg=[-1 1]*1;
+end
 global cells cells_old n x y rulecurr async px py
 rind=1;
 k=rind;
@@ -49,14 +53,13 @@ rulecurr=@(a) 1-(mod(100*a,100)/100);
 rulecurr=@(a) tanh(a/10).*sin(a);
 
 figure(1)
-rg=[-1 1]*1.0;
-fi=imagesc(cells(xyid)',rg);
+fi=imagesc(cells(xyid)',crg);
 figure(2)
 h=histogram(cells(xyid));
 figure(3)
 h2=histogram2(cells(xyid),cells(xyid),100);
 % edge=-1:0.025:1;
-edge=linspace(rg(1),rg(2),100);
+edge=linspace(crg(1),crg(2),100);
 h2=histogram2(cells(xyid),cells(xyid),edge,edge);
 view(30,30);
 zlim([10,2000]);
@@ -209,8 +212,9 @@ cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
 
 S_inputold=S_input;
-S_input=conv2(cells,fir,'same');
-Sinput=(floor(div*S_input)/div);
+Sinput=conv2(cells,fir,'same');
+S_input=Sinput(xyid);
+Sinput=(floor(div*Sinput)/div);
 % cells=rulecurr(Sinput);
 % Sinput(xyid)=eval(f1);
 % Sinput(xyid)=eval(f2);
@@ -221,8 +225,8 @@ cells=torus(cells);
 cellsT=gather(cells(xyid));
 %stepnum=stepnum+1;
 if mod(stepnum,intl)==0
-% set(fi,'CData',cells(xyid)')
-set(fi,'CData',stdfilt(cells(xyid))');
+set(fi,'CData',cells(xyid)')
+% set(fi,'CData',stdfilt(cells(xyid))');
 set(h,'Data',cells(xyid))
 % set(h2,'Data',[cold(:),cellsT(:)])
 set(h2,'Data',[S_input(:),cold(:)]);
