@@ -9,17 +9,12 @@
     [ruleB,ruleS]=rulelist{i,:};
     end
     
-    
-    if k==9;
-    B=find(ruleB==1)-1;
-    S=find(ruleS==1)-2;
-    elseif k==8
+
     B=find(ruleB==1)-1;
     S=find(ruleS==1)-1;
-    else
-    B=ruleB;
-    S=ruleS;
-    end
+    rstr=sprintf('B%s/S%s',num2str(B')',num2str(S')');
+
+    
     disp(['ruleB=' num2str(B)]);
     disp(['ruleS=' num2str(S)]);
 %     disp(['rulenum=' num2str(rulenumber)])
