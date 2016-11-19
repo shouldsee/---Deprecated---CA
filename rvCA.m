@@ -34,20 +34,25 @@ end
 cells=torus(cells);
 rulecurr=@(a) 1-(mod(100*a,100)/100);
 % rulecurr=@(a) (mod(a,4))/4;
-rulecurr=@(a) tanh(a/10).*sin(a)
+rulecurr=@(a) tanh(a/10).*sin(a);
 
 figure(1)
-fi=imagesc(cells(xyid)',[-0.5 1]*1);
+rg=[-1 1]*1.0;
+fi=imagesc(cells(xyid)',rg);
 figure(2)
 h=histogram(cells(xyid));
 figure(3)
 h2=histogram2(cells(xyid),cells(xyid),100);
-edge=-0.5:0.025:1;
+% edge=-1:0.025:1;
+edge=linspace(rg(1),rg(2),100);
 h2=histogram2(cells(xyid),cells(xyid),edge,edge);
 view(30,30);
 zlim([10,2000]);
 set(gca,'ZScale','log')
+if ~exist('ex','var')
 ex=15;
+end
+
 px=linspace(-ex,ex,n+2);
 py=linspace(-ex,ex,n+2);
 px=px(x1);
@@ -85,8 +90,14 @@ upf=@(a,b) mod(a,8)+mod(b,1);
 fc='Sinput(xyid)=arrayfun(upf,Sinput(xyid),cells(xyid));';
 fc='Sinput(xyid)=mod(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py,1);';
 % fc='Sinput(xyid)=(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py)./(8./px+1./py);';
-fc='Sinput(xyid)=(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py);';
+fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
 updateFcn=[fc];
+if ~exist('mod1','var')
+mod1=4;
+end
+if ~exist('mod2','var')
+    mod2=1;
+end
 % f2='Sinput(xyid);'
 
 % px=px(128,1);
@@ -116,6 +127,21 @@ rect=[271,1;
 % rect=[40,80;
 %       160,81];
 % rect=[1,20;200,150];
+% % rect=[300,140;329,155];
+% rect=[163,60;164,60];
+
+% rect=[30,224;
+%       30,227]; %bb-mosa interface
+% rect=[80,208;
+%       128,240];
+% rect=[90,180;
+%       128,380];
+% rect=[80,240;
+%       80,240];
+
+% px=repmat(linspace(px(rect(1,1),1),px(rect(2,1),1),n)',1,n);
+% py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
+
 rect=[300,140;329,155];
 rect=[163,60;164,60];
 px=repmat(linspace(px(rect(1,1),1),px(rect(2,1),1),n)',1,n);
@@ -123,6 +149,16 @@ py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
 % rect=[193,209;194,210];
 % rect=[200,96;200,96];
 % rect=[51,64;126,121];
+
+% rect=[159,283;
+%       159,283];
+% rect=[100,180;
+%       103,215]; %bb-mosa interface
+
+% rect=[100,210;
+%       103,215]; %bb
+% % rect=[100,50;
+% %       103,180];
 % px=repmat(linspace(px(rect(1,1),1),px(rect(2,1),1),n)',1,n);
 % py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
 
@@ -137,9 +173,13 @@ py=repmat(linspace(py(1,rect(1,2)),py(1,rect(2,2)),n),n,1);
 % px=repmat(linspace(px(25,1),px(35,1),n)',1,n);
 % py=repmat(linspace(py(1,135),py(1,150),n),n,1);
 
-xlabel('px');
-ylabel('py');
 ax=fi.Parent;
+% fir=[1 1 1; 1 0 1; 1 1 1];
+% fir=[1 1 1; 1 1 1; 1 1 1];
+% fir=[0 1 0; 1 1 1; 0 1 0];
+% fir=[0 1 0; 1 1 1; 1 1 0];
+fir=ones(3,3)*3;
+% fir=rand(5,5);
 xlabel(ax,'px');
 ylabel(ax,'py');
 set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
@@ -158,7 +198,7 @@ cells=floor(div*cells)/div;
 cold=gather(cells);
 
 S_inputold=S_input;
-S_input=conv2(cells,[1 1 1; 1 0 1; 1 1 1],'same');
+S_input=conv2(cells,fir,'same');
 Sinput=(floor(div*S_input)/div);
 % cells=rulecurr(Sinput);
 % Sinput(xyid)=eval(f1);
@@ -170,9 +210,11 @@ cells=torus(cells);
 cellsT=gather(cells(xyid));
 %stepnum=stepnum+1;
 if mod(stepnum,intl)==0
-set(fi,'CData',cells(xyid)')
+% set(fi,'CData',cells(xyid)')
+set(fi,'CData',stdfilt(cells(xyid))');
 set(h,'Data',cells(xyid))
-set(h2,'Data',[cold(:),cellsT(:)])
+% set(h2,'Data',[cold(:),cellsT(:)])
+set(h2,'Data',[S_input(:),cold(:)]);
 mv=mean(cells(:));
 MAX=max(cells(:));
 MIN=min(cells(:));
@@ -209,3 +251,5 @@ plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
 %%
 max
 (px(:)); min(px(:))
+[min(px(:)) max(px(:));
+  min(py(:)) max(py(:))]'

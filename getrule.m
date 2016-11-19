@@ -2,11 +2,11 @@ if randrule==0
             r=ruletemp(rind,:);
              rule=[r{1},r{2}];
 elseif randrule==1;
-		ktemp=k;
-		k=8;
-		rrule=1;
-		update_rule;
-		ruletemp(rind,:)={ruleB,ruleS};
+	ktemp=k;
+	k=8;
+	rrule=1;
+	update_rule;
+	ruletemp(rind,:)={ruleB,ruleS};
         rulename{rind}=rstr;
         k=ktemp;
         rule=rulecurr;
