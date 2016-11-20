@@ -113,16 +113,17 @@ end
 if ~exist('mod2','var')
     mod2=1;
 end
-py=py/mod1*mod2;
+% py=py/mod1*mod2;
 % py=-px./((mod1-mod2/2)).*(mod2)+py./ex.*px./ex/0.2;
 % py=-px./(mod1-1).*(mod2);
 % rect=[30,224;
 %       30,227]; %bb-mosa interface
-% zoomin([30,224;30,227])
+zoomin([30,224;30,227])
 % zoomin([15,207;32,221])
 % zoomin([90,283;96,290])
-% zoomin([107,308;122,322])
+% zoomin([110,310;126,326])
 % zoomin([86,326;92,332])
+% zoomin([81,382;92,392])
 
 % rect=[100,180;
 %       103,215]; %bb-mosa interface
@@ -273,7 +274,7 @@ fitted
 % figure(7);
 % plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
 %%
-max
+
 (px(:)); min(px(:))
 [min(px(:)) max(px(:));
   min(py(:)) max(py(:))]'
