@@ -10,13 +10,15 @@ if ~exist('record','var')
     record=1;
 end
 if ~exist('gifname','var')
-    gif ~exist ('crg','var')
-crg=[-1 1]*1;
-endifname='gif';
+    gifname='gif';
 end
 if ~exist ('crg','var')
-crg=[-1 1]*1;
+    crg=[-1 1]*1;
 end
+if ~exist('ex','var')
+ex=15;
+end
+
 global cells cells_old n x y rulecurr async px py
 rind=1;
 k=rind;
@@ -42,7 +44,7 @@ p0=0.5;
 
 %%
 if randcell
-cells=rand(n+2,n+2)*1;
+cells=rand(n+2,n+2)*ex;
 % cells=zeros(n+2,n+2);
 cells(10:15,10:15)=rand(6,6)/2;
 end
@@ -64,9 +66,6 @@ h2=histogram2(cells(xyid),cells(xyid),edge,edge);
 view(30,30);
 zlim([10,2000]);
 set(gca,'ZScale','log')
-if ~exist('ex','var')
-ex=15;
-end
 
 px=linspace(-ex,ex,n+2);
 py=linspace(-ex,ex,n+2);
@@ -103,10 +102,13 @@ end
 
 % f2='Sinput(xyid);'
 upf=@(a,b) mod(a,8)+mod(b,1);
+upf=@(a,b,c) b*a*(1-c)
 fc='Sinput(xyid)=arrayfun(upf,Sinput(xyid),cells(xyid));';
 fc='Sinput(xyid)=mod(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py,1);';
 % fc='Sinput(xyid)=(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py)./(8./px+1./py);';
 fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
+fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
+fc='Sinput(xyid)=cells(xyid)./+Sinput(xyid)'
 updateFcn=[fc];
 if ~exist('mod1','var')
 mod1=4;
@@ -114,11 +116,17 @@ end
 if ~exist('mod2','var')
     mod2=1;
 end
-% py=-px./mod1.*(mod2)+py./30.*px./100;
-% py=-px./mod1.*(mod2);
+% py=py/mod1*mod2;
+% py=-px./((mod1-mod2/2)).*(mod2)+py./ex.*px./ex/0.2;
+% py=-px./(mod1-1).*(mod2);
 % rect=[30,224;
 %       30,227]; %bb-mosa interface
-% zoomin([30,224;30,227])
+zoomin([30,224;30,227])
+% zoomin([15,207;32,221])
+% zoomin([90,283;96,290])
+% zoomin([110,310;126,326])
+% zoomin([86,326;92,332])
+% zoomin([81,382;92,392])
 
 % rect=[100,180;
 %       103,215]; %bb-mosa interface
@@ -194,7 +202,8 @@ rect=[163,60;164,60];
 ax=fi.Parent;
 fir=[1 1 1; 1 0 1; 1 1 1];
 % fir=[1 1 1; 1 1 1; 1 1 1];
-% fir=[0 1 0; 1 1 1; 0 1 0];
+fir=[0 1 0; 1 1 1; 0 1 0];
+fir(2,2)=0;
 % fir=[0 1 0; 1 1 1; 1 1 0];
 % fir=ones(3,3)*3;
 % fir=rand(5,5);
@@ -208,14 +217,14 @@ set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
 mvs=zeros(1,stepnum);
 mv=mean(cells(:));
 ck0=eye(n,n);
-
+figure(1)
 for stepnum=1:stepmax
     %%
     pr=rand(n,n);
 cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
 
-S_inputold=S_input;
+% S_inputold=S_input;
 Sinput=conv2(cells,fir,'same');
 S_input=Sinput(xyid);
 Sinput=(floor(div*Sinput)/div);
@@ -263,12 +272,13 @@ mvs(stepnum)=gather(mv);
 end
 
 %%
-figure(6)
-histogram(cells(xyid),linspace(0,0.4,100));
-figure(7);
-plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
+fitted
+% figure(6)
+% histogram(cells(xyid),linspace(0,0.4,100));
+% figure(7);
+% plot(linspace(0,1,length(mvs)),abs(fft(mvs)))
 %%
-max
+
 (px(:)); min(px(:))
 [min(px(:)) max(px(:));
   min(py(:)) max(py(:))]'

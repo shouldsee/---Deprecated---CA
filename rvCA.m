@@ -102,10 +102,21 @@ end
 
 % f2='Sinput(xyid);'
 upf=@(a,b) mod(a,8)+mod(b,1);
+qmap=@(a,b) b.*a.*(1-a);
 fc='Sinput(xyid)=arrayfun(upf,Sinput(xyid),cells(xyid));';
 fc='Sinput(xyid)=mod(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py,1);';
 % fc='Sinput(xyid)=(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py)./(8./px+1./py);';
 fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
+fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
+fc=['cells(xyid)=qmap(cells(xyid),1.*px);\n',...
+    'cells=torus(cells);\n',...
+    'Sinput=conv2(cells,nfir,''same'');\n',...
+    'S_input=Sinput(xyid);\n',...
+    'Sinput(xyid)=(Sinput(xyid)-cells(xyid)).*py+(1-1.*py).*cells(xyid);\n',...
+    'Sinput=max(min(Sinput,1),0);\n',...
+    ];
+fc=sprintf(fc);
+%     'Sinput(xyid)'
 updateFcn=[fc];
 if ~exist('mod1','var')
 mod1=4;
@@ -113,18 +124,21 @@ end
 if ~exist('mod2','var')
     mod2=1;
 end
+% px=3.6*ones(size(xyid));
+% py=0.7*ones(size(xyid));
+
 % py=py/mod1*mod2;
 % py=-px./((mod1-mod2/2)).*(mod2)+py./ex.*px./ex/0.2;
 % py=-px./(mod1-1).*(mod2);
 % rect=[30,224;
 %       30,227]; %bb-mosa interface
-zoomin([30,224;30,227])
+% zoomin([30,224;30,227])
 % zoomin([15,207;32,221])
 % zoomin([90,283;96,290])
 % zoomin([110,310;126,326])
 % zoomin([86,326;92,332])
 % zoomin([81,382;92,392])
-
+zoomin([201,201;400,400])
 % rect=[100,180;
 %       103,215]; %bb-mosa interface
 % rect=[100,210;
@@ -199,10 +213,13 @@ rect=[163,60;164,60];
 ax=fi.Parent;
 fir=[1 1 1; 1 0 1; 1 1 1];
 % fir=[1 1 1; 1 1 1; 1 1 1];
-% fir=[0 1 0; 1 1 1; 0 1 0];
+fir=[0 1 0; 1 1 1; 0 1 0];
+fir(2,2)=0;
 % fir=[0 1 0; 1 1 1; 1 1 0];
 % fir=ones(3,3)*3;
 % fir=rand(5,5);
+
+nfir=fir/sum(fir(:));
 xlabel(ax,'px');
 ylabel(ax,'py');
 set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
@@ -214,6 +231,7 @@ mvs=zeros(1,stepnum);
 mv=mean(cells(:));
 ck0=eye(n,n);
 figure(1)
+% cells=rand(n+2,n+2)+0.1;
 for stepnum=1:stepmax
     %%
     pr=rand(n,n);
@@ -221,13 +239,13 @@ cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
 
 % S_inputold=S_input;
-Sinput=conv2(cells,fir,'same');
-S_input=Sinput(xyid);
-Sinput=(floor(div*Sinput)/div);
+
+% Sinput=(floor(div*Sinput)/div);
+eval(updateFcn);
 % cells=rulecurr(Sinput);
 % Sinput(xyid)=eval(f1);
 % Sinput(xyid)=eval(f2);
-eval(updateFcn);
+
 % Sinput(xyid)=mod(Sinput(xyid),px)./py;
 cells(xyid)=Sinput(xyid);
 cells=torus(cells);
