@@ -226,7 +226,7 @@ set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
 set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
 set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
 set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
-% cells=gpuArray(cells);
+cells=gpuArray(cells);
 mvs=zeros(1,stepnum);
 mv=mean(cells(:));
 ck0=eye(n,n);
@@ -252,11 +252,11 @@ cells=torus(cells);
 cellsT=gather(cells(xyid));
 %stepnum=stepnum+1;
 if mod(stepnum,intl)==0
-set(fi,'CData',cells(xyid)')
+set(fi,'CData',gather(cells(xyid)'))
 % set(fi,'CData',stdfilt(cells(xyid))');
-set(h,'Data',cells(xyid))
+set(h,'Data',gather(cells(xyid)))
 % set(h2,'Data',[cold(:),cellsT(:)])
-set(h2,'Data',[S_input(:),cold(:)]);
+set(h2,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
 MIN=min(cells(:));
