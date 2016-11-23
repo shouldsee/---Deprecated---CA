@@ -30,7 +30,7 @@ if randrule
 getrule;
 end
 
-n=400;
+n=100;
 x=2:n+1;
 y=2:n+1;
 if randcell
@@ -48,6 +48,8 @@ cells=rand(n+2,n+2)*ex;
 % cells=zeros(n+2,n+2);
 cells(10:15,10:15)=rand(6,6)/2;
 end
+cells=rand(n+2,n+2)*ex;
+speed=rand(n+2,n+2)*ex;
 %
 cells=torus(cells);
 rulecurr=@(a) 1-(mod(100*a,100)/100);
@@ -107,14 +109,35 @@ fc='Sinput(xyid)=arrayfun(upf,Sinput(xyid),cells(xyid));';
 fc='Sinput(xyid)=mod(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py,1);';
 % fc='Sinput(xyid)=(mod(Sinput(xyid),8)./px+mod(cells(xyid),1)./py)./(8./px+1./py);';
 fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
-fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
-fc=['cells(xyid)=qmap(cells(xyid),1.*px);\n',...
-    'cells=torus(cells);\n',...
-    'Sinput=conv2(cells,nfir,''same'');\n',...
-    'S_input=Sinput(xyid);\n',...
-    'Sinput(xyid)=(Sinput(xyid)-cells(xyid)).*py+(1-1.*py).*cells(xyid);\n',...
-    'Sinput=max(min(Sinput,1),0);\n',...
-    ];
+% syms a b c d
+% wrap_syms=mod(a,mod1)/c+mod(b,mod2)/d;
+wrap=@(cells,Sinput) mod(Sinput,mod1)./px+mod(cells,mod2)./py;
+% T = convmtx2(H,m,n) 
+% reshape(T*cells(:),size(H)+[m n]-1); 
+% fc=['Sinput=conv2(cells,nfir,''same'');\n',...
+%     'Sinput(xyid)=wrap(cells(xyid),Sinput(xyid));\n',...
+%     'cells(xyid)=Sinput(xyid);',...
+%     'cells=torus(cells);'],...
+%     'lyap='];
+fc=['cellsT=cells(xyid);',...
+'Sinput=reshape(TT*cellsT(:),n,n);',...
+'cells(xyid)=wrap(Sinput,cells(xyid));',...
+'jcb=(ddpx+ddpy)*TT*jcb;'];
+
+% fc=['cells(xyid)=qmap(cells(xyid),1.*px);\n',...
+%     'cells=torus(cells);\n',...
+%     'Sinput=conv2(cells,nfir,''same'');\n',...
+%     'S_input=Sinput(xyid);\n',...
+%     'Sinput(xyid)=(Sinput(xyid)-cells(xyid)).*py+(1-1.*py).*cells(xyid);\n',...
+%     'Sinput=max(min(Sinput,1),0);\n',...
+%     ];
+% fc=['cells=torus(cells);\n',...
+%     'speed=torus(speed);\n',...
+%     'speed(xyid)=speed(xyid)-(conv2(cells(xyid),nfir,''same'')-cells(xyid))./px;\n',...
+%     'Sinput(xyid)=cells(xyid)+speed(xyid);\n',...
+% %     'Sinput(xyid)=(Sinput(xyid)-cells(xyid)).*py+(1-1.*py).*cells(xyid);\n',...
+% %     'Sinput=max(min(Sinput,1),0);\n',...
+%     ];
 fc=sprintf(fc);
 %     'Sinput(xyid)'
 updateFcn=[fc];
@@ -138,7 +161,7 @@ end
 % zoomin([110,310;126,326])
 % zoomin([86,326;92,332])
 % zoomin([81,382;92,392])
-zoomin([201,201;400,400])
+% zoomin([201,201;400,400])
 % rect=[100,180;
 %       103,215]; %bb-mosa interface
 % rect=[100,210;
@@ -220,13 +243,24 @@ fir(2,2)=0;
 % fir=rand(5,5);
 
 nfir=fir/sum(fir(:));
+TT=linconv(nfir,cells(xyid));
+ddpx=sparse(diag(1./px(:)));
+ddpy=sparse(diag(1./py(:)));
+% frame=speye([n,n,n,n]);
+% % ddpx=sqrt(bsxfun(@times,ddpx,shiftdim(ddpx,-2)));
+% ddpy=sqrt(bsxfun(@times,ddpy,shiftdim(ddpy,-2)));
+% ddpx=sparse(reshape(ddpx,n^2,n^2));
+% ddpy=sparse(reshape(ddpy,n^2,n^2));
+TT=sparse(TT);
+jcb=((ddpx+ddpy)*TT);
+
 xlabel(ax,'px');
 ylabel(ax,'py');
 set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
 set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
 set(ax,'XTickLabels',cellstr(num2str(px(ax.XTick,1),3)));
 set(ax,'YTickLabels',cellstr(num2str(py(1,ax.YTick)',3)));
-cells=gpuArray(cells);
+% cells=gpuArray(cells);
 mvs=zeros(1,stepnum);
 mv=mean(cells(:));
 ck0=eye(n,n);
@@ -246,17 +280,17 @@ eval(updateFcn);
 % Sinput(xyid)=eval(f1);
 % Sinput(xyid)=eval(f2);
 
-% Sinput(xyid)=mod(Sinput(xyid),px)./py;
-cells(xyid)=Sinput(xyid);
-cells=torus(cells);
-cellsT=gather(cells(xyid));
-%stepnum=stepnum+1;
+% % Sinput(xyid)=mod(Sinput(xyid),px)./py;
+% cells(xyid)=Sinput(xyid);
+% cells=torus(cells);
+% cellsT=gather(cells(xyid));
+% %stepnum=stepnum+1;
 if mod(stepnum,intl)==0
 set(fi,'CData',gather(cells(xyid)'))
 % set(fi,'CData',stdfilt(cells(xyid))');
 set(h,'Data',gather(cells(xyid)))
 % set(h2,'Data',[cold(:),cellsT(:)])
-set(h2,'Data',gather([S_input(:),cold(:)]));
+% set(h2,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
 MIN=min(cells(:));
