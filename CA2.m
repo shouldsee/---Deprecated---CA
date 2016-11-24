@@ -21,7 +21,6 @@ figure(2)
 % h1=histogram(1:2^20,4000);
 % set(gca,'YScale','log')
 % subplot(2,2,3)
-stepmax=200;
 cold=zeros(lag,n^2);
 expos=2.^((1:lag)-1)';
 rec=[];
@@ -51,11 +50,12 @@ for stepnum=1:stepmax
    cells=rulecurr(Sinput+1);
    cells=torus(cells);
    coldT=cat(3,cells,coldT(:,:,1:lag-1));
-   rsd_coldT=convn(coldT,RsVct,'same');
-   rsd_cold=rsd_coldT(x,y,:);
-   ct=sum(hist(rsd_cold(:),0:2^(pw^dm)-1)~=0);
-   H_cpd=log(ct/2^(pw^dm));
-   order=-H_cpd;
+   order=spatial_corr(cells);
+%    rsd_coldT=convn(coldT,RsVct,'same');
+%    rsd_cold=rsd_coldT(x,y,:);
+%    ct=sum(hist(rsd_cold(:),0:2^(pw^dm)-1)~=0);
+%    H_cpd=log(ct/2^(pw^dm));
+%    order=-H_cpd;
    if stepnum>lag
    rec(stepnum-lag)=order;
    if stepnum>vnum+lag;
@@ -86,7 +86,7 @@ plot(rec,[nan diff(rec)]);
 hold off
 rulename{rind}
 rind=rind+1
-order
+% order
 xlim([0 5])
 ylim([0 0.2])
 %%
