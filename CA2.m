@@ -44,7 +44,11 @@ for rulenum=rulenum0:rulemax;
 cells=randi([0 1],[n+2 n+2]);
 rec=zeros(1,stepmax-lag);
 rind=rulenum;
-getrule
+try;
+    getrule
+catch;
+    break
+end
 for stepnum=1:stepmax
    Sinput=conv2(cells,FIR.S_input,'same');
    cells=rulecurr(Sinput+1);
@@ -76,19 +80,26 @@ for stepnum=1:stepmax
      
 end
 reco(rulenum,:)=rec;
-
+figure(2)
+% hold on
+rec=movmean(rec,2,'Endpoints','Discard');
+imagesc(reco(1:rind,:));
+ax=gca;
+set(ax,'YTick',1:rind)
+set(ax,'YTickLabels',[rulename(ax.YTick)])
 end
 %%
 figure(2)
 % hold on
 rec=movmean(rec,2,'Endpoints','Discard');
-plot(rec,[nan diff(rec)]);
-hold off
-rulename{rind}
-rind=rind+1
-% order
-xlim([0 5])
-ylim([0 0.2])
+imagesc(reco(1:rind-1,:));
+% plot(rec,[nan diff(rec)]);
+% hold off
+% rulename{rind}
+% rind=rind+1
+% % order
+% xlim([0 5])
+% ylim([0 0.2])
 %%
 subreco=reco(1:rulenum,:);
 [wcoeff,score,latent,tsquared,explained]=pca(subreco);
