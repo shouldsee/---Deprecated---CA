@@ -2,9 +2,9 @@ lag=1;
 n=400;
 name='nerd';
 loadrule
-rind=11;
+rind=1;
 % rulecurr=ones(1,18);
-brun=0;
+brun=7;
 getrule;
 % rulecurr=name2rule('B3/S23');
 rulecurr(rulecurr==0)=-1;
@@ -53,8 +53,8 @@ prelim=cells;
 % coold=rand(n+2,n+2)<0.5\n;
 while true;
     if mod(stepnum,intl)==0;
-%         set(fi,'CData',(stdfilt(cells)));
-        set(fi,'CData',(cells));
+        set(fi,'CData',(stdfilt(cells)));
+%         set(fi,'CData',(cells));
         drawnow
         brun=get(b,'Value');
         intl=ceil(get(intel,'Value'));
@@ -86,9 +86,10 @@ while true;
 % %     udt=pm>1;
     avg=conv2(cells,nfir,'same');
 prelim(xyid)=rulecurr(proj(avg(xyid))+9/2*(cells(xyid)+1));
-logis=(px<pmat).*1.*px+(py<pmat).*(-cells).*py>0;
-logis=(px<py).*cells+(px>=py).*-cells;
-cells=( px<pmat | py<pmat).*logis+( px>pmat & py>pmat).*prelim;
+% logis=(px<pmat).*1.*px+(py<pmat).*(-cells).*py>0;
+% logis=(px<py).*cells+(px>=py).*-cells;
+% cells=( px<pmat | py<pmat).*logis+( px>pmat & py>pmat).*prelim;
+cells=(px<pmat).*-prelim+( px>pmat).*prelim;
 % cells(cells==0)
 %     cells=(udt.*(rand(n+2,n+2)<px)-0.5)*-2.*cells;
 % % cells=(udt-0.5)*-2.*cells;

@@ -1,5 +1,5 @@
 lag=1;
-n=1000;
+n=200;
 % name='nerd';
 % loadrule
 rind=1;
@@ -8,13 +8,18 @@ brun=0;
 % getrule
 init_CA
 figure(3)
-beta0=linspace(-5,5,n+2)/3;
+beta0=linspace(-5,5,n+2)/4;
 bmat=repmat(1./beta0',1,n+2);
 b = uicontrol('Style','slider','Min',min(beta0),'Max',max(beta0),...
                 'SliderStep',diff(beta0(1:3)),'Value',beta0(1),...
                 'Position',[20 20 200 20],...
                 'CallBack',@(hObj,eventdata) get(hObj,'Value'));
-[outstring,newpos] = textwrap(b,cellstr(sprintf('%.2f',get(b,'Value'))));
+intel = uicontrol('Style','slider','Min',1,'Max',8000,...
+    'SliderStep',[0.5 0.5],'Value',4,...
+    'Position',[200 20 200 20],...
+    'CallBack',@(hObj,eventdata) get(hObj,'Value'));
+            [outstring,newpos] = textwrap(b,cellstr(sprintf('%.2f',get(b,'Value'))));
+
             %     set(b,'Callback',); 
 cells=(single(rand(n+2,n+2)<0.8)-0.5)*2;
 fi=imagesc(cells);
@@ -42,25 +47,31 @@ while true;
 %         set(fi,'CData',(stdfilt(cells)));
         set(fi,'CData',(cells));
         drawnow
-        brun=get(b,'Value');
-        fprintf('beta=%.2f\n, stepnum=%d',get(b,'Value'),stepnum);
+        brun=1/get(b,'Value');
+        intl=ceil(get(intel,'Value'));
+        fprintf('beta=%.2f, stepnum=%d, energy=%.3d, mag=%.3d \n',get(b,'Value'),stepnum,mean(avg(:).*cells(:)),mean(cells(:)));
     end
-    id=randi([1 prod(siz)],1);
+    id=randi([1 prod(siz)],[1,2]);
     [xi,yi]=ind2sub(siz,id);
     xi=xi+2;
     yi=yi+2;
+    id=sub2ind([n+2,n+2],xi,yi);
     %% sequential udt
-%    p=exp(-brun*2*cells(xi,yi)*avg(xi,yi));
-%    p=exp(-bmat(xi,yi)*2*cells(xi,yi)*avg(xi,yi));
+    if sum(cells(id))==0;
+%    p=exp(mean(-brun.*2.*cells(id).*avg(id)));
+% %    p=exp(-bmat(xi,yi)*2*cells(xi,yi)*avg(xi,yi));
 % %    udt=p>1;
 %    p=min(1,p);
 %    udt=rand(1,1)<p;
-% %    udt=p==1;
+    udt=mean(-brun.*2.*cells(id).*avg(id))>0;
+%    udt=p==1;
 %     udt=avg(xi,yi)==0;
-%    if udt;
-%        cells(xi,yi)=-cells(xi,yi);
-%        avg(xi-1:xi+1,yi-1:yi+1)=conv2(cells(xi-2:xi+2,yi-2:yi+2),nfir,'valid');
-%    end
+   if udt;
+       cells(id)=-cells(id);
+       avg(xi-1:xi+1,yi-1:yi+1)=conv2(cells(xi-2:xi+2,yi-2:yi+2),nfir,'valid');
+   end
+   
+    end
     %% sync udt
 % %     pm=exp(-brun*2*cells*avg);
 %     pm=exp(-bmat.*2.*cells.*avg);
@@ -70,10 +81,10 @@ while true;
 % % cells=(udt-0.5)*-2.*cells;
 % %    
     %% Q2R CA
-    avg=conv2(cells,nfir,'same');
-    rev=((avg==0 & chk)-0.5)*2;
-    cells=cells.*-1.*rev;
-    chk=1-chk;
+%     avg=conv2(cells,nfir,'same');
+%     rev=((avg==0 & chk)-0.5)*2;
+%     cells=cells.*-1.*rev;
+%     chk=1-chk;
 %     cells=(((avg==0)-0.5).*2.*coold);
     
     %%
