@@ -9,18 +9,19 @@ subplot(3,1,[1 2])
 f1=imagesc([stds*100 overlay1]);
 subplot(3,1,3);
 figure(6)
-ppx=160;
-ppy=1;
-m1=linspace(-mod1,mod1,100);
-m2=linspace(-mod2,mod2,100);
-m=abs(mod1/ppx)+abs(mod2/ppy);
-m=linspace(-m,m,200);
-[m1,m2]=ndgrid(m,m);
+
+mm=[min(Sinput(:)) max(Sinput(:))];
+m1=linspace(mm(1),mm(2),100);
+m2=linspace(mm(1),mm(2),100);
+% m=abs(1/ppx)+abs(1/ppy);
+% m=linspace(-m,m,200);
+[m1,m2]=ndgrid(m1,m2);
 
 % ppx=px(floor(size(px,1)/2),1);
 % ppy=py(1,floor(size(py,2)/2));
 
-o=mod(m1,mod1)/ppx+mod(m2,mod2)/ppy;
+% o=mod(m1,mod1)/ppx+mod(m2,mod2)/ppy;
+o=wrap1(m2,m1);
 % histogram2(S_input,cold,50);
 % set(gca,'ZScale','log')
 % hold on

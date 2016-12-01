@@ -30,7 +30,7 @@ if randrule
 getrule;
 end
 
-n=100;
+n=500;
 x=2:n+1;
 y=2:n+1;
 if randcell
@@ -48,7 +48,8 @@ cells=rand(n+2,n+2)*ex;
 % cells=zeros(n+2,n+2);
 cells(10:15,10:15)=rand(6,6)/2;
 end
-cells=rand(n+2,n+2)*ex;
+rsoup=rand(n+2,n+2)*ex;
+cells=rsoup;
 speed=rand(n+2,n+2)*ex;
 %
 cells=torus(cells);
@@ -112,17 +113,24 @@ fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
 % syms a b c d
 % wrap_syms=mod(a,mod1)/c+mod(b,mod2)/d;
 wrap=@(cells,Sinput) mod(Sinput,mod1)./px+mod(cells,mod2)./py;
+% wrap1=@(cells,Sinput) mod(Sinput,px)+mod(cells,px);
+% wrap1=@(cells,Sinput) mod(Sinput,1)./px+mod(cells,1)./py;
+ppx=-1.2;
+% ppy=3.3;
+ppy=5.86
+wrap1=@(cells,Sinput) mod(Sinput,1)./ppx+mod(cells,1)/ppy;
+
 % T = convmtx2(H,m,n) 
 % reshape(T*cells(:),size(H)+[m n]-1); 
-% fc=['Sinput=conv2(cells,nfir,''same'');\n',...
-%     'Sinput(xyid)=wrap(cells(xyid),Sinput(xyid));\n',...
-%     'cells(xyid)=Sinput(xyid);',...
-%     'cells=torus(cells);'],...
+fc=['Sinput=conv2(cells,nfir,''same'');\n',...
+    'Sinput(xyid)=wrap1(cells(xyid),Sinput(xyid));\n',...
+    'cells(xyid)=Sinput(xyid);',...
+    'cells=torus(cells);'],...
 %     'lyap='];
-fc=['cellsT=cells(xyid);',...
-'Sinput=reshape(TT*cellsT(:),n,n);',...
-'cells(xyid)=wrap(Sinput,cells(xyid));',...
-'jcb=(ddpx+ddpy)*TT*jcb;'];
+% fc=['cellsT=cells(xyid);',...
+% 'Sinput=reshape(TT*cellsT(:),n,n);',...
+% 'cells(xyid)=wrap(Sinput,cells(xyid));',...
+% 'jcb=(ddpx+ddpy)*TT*jcb;'];
 
 % fc=['cells(xyid)=qmap(cells(xyid),1.*px);\n',...
 %     'cells=torus(cells);\n',...
@@ -243,16 +251,17 @@ fir(2,2)=0;
 % fir=rand(5,5);
 
 nfir=fir/sum(fir(:));
-TT=linconv(nfir,cells(xyid));
-ddpx=sparse(diag(1./px(:)));
-ddpy=sparse(diag(1./py(:)));
+% TT=linconv(nfir,cells(xyid));
+% ddpx=sparse(diag(1./px(:)));
+% ddpy=sparse(diag(1./py(:)));
+% TT=sparse(TT);
+% jcb=((ddpx+ddpy)*TT);
+
 % frame=speye([n,n,n,n]);
 % % ddpx=sqrt(bsxfun(@times,ddpx,shiftdim(ddpx,-2)));
 % ddpy=sqrt(bsxfun(@times,ddpy,shiftdim(ddpy,-2)));
 % ddpx=sparse(reshape(ddpx,n^2,n^2));
 % ddpy=sparse(reshape(ddpy,n^2,n^2));
-TT=sparse(TT);
-jcb=((ddpx+ddpy)*TT);
 
 xlabel(ax,'px');
 ylabel(ax,'py');
@@ -269,7 +278,7 @@ figure(1)
 for stepnum=1:stepmax
     %%
     pr=rand(n,n);
-cells=floor(div*cells)/div;
+% cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
 
 % S_inputold=S_input;
@@ -313,7 +322,7 @@ else
     imwrite(imind,cm,[gifname '.gif'],'gif','WriteMode','append','DelayTime',0.05);
 end
 end
-pause(0.05)
+pause(0.01)
 % stepnum=stepnum-intl+1;
 end
 mvs(stepnum)=gather(mv);
