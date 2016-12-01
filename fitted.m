@@ -9,26 +9,23 @@ subplot(3,1,[1 2])
 f1=imagesc([stds*100 overlay1]);
 subplot(3,1,3);
 figure(6)
-
+clf
 mm=[min(Sinput(:)) max(Sinput(:))];
 m1=linspace(mm(1),mm(2),100);
 m2=linspace(mm(1),mm(2),100);
 % m=abs(1/ppx)+abs(1/ppy);
 % m=linspace(-m,m,200);
 [m1,m2]=ndgrid(m1,m2);
-
 % ppx=px(floor(size(px,1)/2),1);
 % ppy=py(1,floor(size(py,2)/2));
-
 % o=mod(m1,mod1)/ppx+mod(m2,mod2)/ppy;
 o=wrap1(m2,m1);
-% histogram2(S_input,cold,50);
-% set(gca,'ZScale','log')
-% hold on
+% hh=histogram2(S_input(xyid),cold,50);
+set(gca,'ZScale','log')
 syms a b
 % fsurf(@(x,y))
-surface(m1,m2,(o))
-mesh(m1,m2,o)
+% ss=surface(m1,m2,10.^(o),o^2);
+mesh(m1,m2,10.^(o),o)
 shading interp
 set(gca,'ydir','reverse')
 hold on
@@ -38,8 +35,9 @@ zs=m2;
 surf(xs,ys,zs,1*ones(size(xs)));
 shading interp;% fsurf(x,sum(fir(:))*f);
 hold off
+view(30,60)
 xlabel('S input')
-colormap gray
+colormap default
 
 title('fitted with (sig(py/3)-0.5)*15-px*1=0')
 ax=f1.Parent;

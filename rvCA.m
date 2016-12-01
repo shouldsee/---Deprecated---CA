@@ -30,7 +30,7 @@ if randrule
 getrule;
 end
 
-n=500;
+n=300;
 x=2:n+1;
 y=2:n+1;
 if randcell
@@ -115,14 +115,16 @@ fc='Sinput(xyid)=(mod(Sinput(xyid),mod1)./px+mod(cells(xyid),mod2)./py);';
 wrap=@(cells,Sinput) mod(Sinput,mod1)./px+mod(cells,mod2)./py;
 % wrap1=@(cells,Sinput) mod(Sinput,px)+mod(cells,px);
 % wrap1=@(cells,Sinput) mod(Sinput,1)./px+mod(cells,1)./py;
+ppx=-1.6;
+ppy=2.2;
 ppx=-1.2;
-% ppy=3.3;
-ppy=5.86
+ppy=5.86;
+% ppy=9
 wrap1=@(cells,Sinput) mod(Sinput,1)./ppx+mod(cells,1)/ppy;
 
 % T = convmtx2(H,m,n) 
 % reshape(T*cells(:),size(H)+[m n]-1); 
-fc=['Sinput=conv2(cells,nfir,''same'');\n',...
+fc=['Sinput=conv2(cells,nfir,''same'');S_input=Sinput;\n',...
     'Sinput(xyid)=wrap1(cells(xyid),Sinput(xyid));\n',...
     'cells(xyid)=Sinput(xyid);',...
     'cells=torus(cells);'],...
