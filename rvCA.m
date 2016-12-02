@@ -58,16 +58,20 @@ rulecurr=@(a) 1-(mod(100*a,100)/100);
 rulecurr=@(a) tanh(a/10).*sin(a);
 
 figure(1)
+subplot(3,3,[1:2 1:2+3])
 fi=imagesc(cells(xyid)',crg);
+title(sprintf('aaa \n aaa  \n aaa\n aaa\n aaa\n aaa\n aaa'))
 figure(2)
 h=histogram(cells(xyid));
-figure(3)
-h2=histogram2(cells(xyid),cells(xyid),100);
+% figure(3)
+% h2=histogram2(cells(xyid),cells(xyid),100);
 % edge=-1:0.025:1;
+figure(1)
 edge=linspace(crg(1),crg(2),100);
+subplot(3,3,7)
 h2=histogram2(cells(xyid),cells(xyid),edge,edge);
 view(30,30);
-zlim([10,2000]);
+zlim([1,n^2/5]);
 set(gca,'ZScale','log')
 
 px=linspace(-ex,ex,n+2);
@@ -116,15 +120,18 @@ wrap=@(cells,Sinput) mod(Sinput,mod1)./px+mod(cells,mod2)./py;
 % wrap1=@(cells,Sinput) mod(Sinput,px)+mod(cells,px);
 % wrap1=@(cells,Sinput) mod(Sinput,1)./px+mod(cells,1)./py;
 ppx=-1.6;
-ppy=2.2;
+ppy=2.6;
 ppx=-1.2;
-ppy=5.86;
+ppy=2;
 % ppy=9
-wrap1=@(cells,Sinput) mod(Sinput,1)./ppx+mod(cells,1)/ppy;
+wrap1=@(cells,Sinput) min(0,mod(Sinput+0.407,1)./ppx+mod(cells,1)/ppy);
+wrap1=@(cells,Sinput) mod(Sinput-0.5,1)./ppx+mod(cells,1)/ppy;
+% wrap1=@(cells,Sinput) mod(Sinput*0.25+0.5,1)./ppx+mod(cells,1)/ppy;
+% wrap1=@(cells,Sinput) min(mod(Sinput,1)./ppx+mod(cells,1)/ppy,0);
 
 % T = convmtx2(H,m,n) 
 % reshape(T*cells(:),size(H)+[m n]-1); 
-fc=['Sinput=conv2(cells,nfir,''same'');S_input=Sinput;\n',...
+fc=['Sinput=conv2(cells,nfir,''same'');S_input=Sinput(xyid);S_input=S_input(:);\n',...
     'Sinput(xyid)=wrap1(cells(xyid),Sinput(xyid));\n',...
     'cells(xyid)=Sinput(xyid);',...
     'cells=torus(cells);'],...
@@ -277,8 +284,34 @@ mv=mean(cells(:));
 ck0=eye(n,n);
 figure(1)
 % cells=rand(n+2,n+2)+0.1;
+b = uicontrol('Style','slider','Min',-3,'Max',3,...
+                'SliderStep',[0.01 0.01],'Value',get(b,'Value'),...
+                'Position',[60 20 200 20],...
+                'CallBack',@(hObj,eventdata) get(hObj,'Value'));
+a = uicontrol('Style','slider','Min',-3,'Max',3,...
+                'SliderStep',[0.01 0.01],'Value',get(a,'Value'),...
+                'Position',[60 40 200 20],...
+                'CallBack',@(hObj,eventdata) get(hObj,'Value'));
+            
+bnumber = uicontrol('style','text', ...
+    'string','1', ...
+   'fontsize',12, ...
+   'position',[0,20,50,20],...
+   'string','0.5');
+            
+anumber = uicontrol('style','text', ...
+    'string','1', ...
+   'fontsize',12, ...
+   'position',[0,40,50,20],...
+   'string','0.5');
 for stepnum=1:stepmax
     %%
+    anow=get(a,'Value');
+    bnow=get(b,'Value');
+    set(anumber,'string',num2str(anow,3))
+    set(bnumber,'string',num2str(bnow,3))
+    wrap1=@(cells,Sinput) mod(Sinput,1)./bnow+mod(cells,1)/anow;
+    braid
     pr=rand(n,n);
 % cells=floor(div*cells)/div;
 cold=gather(cells(xyid));
@@ -299,29 +332,30 @@ eval(updateFcn);
 if mod(stepnum,intl)==0
 set(fi,'CData',gather(cells(xyid)'))
 % set(fi,'CData',stdfilt(cells(xyid))');
-set(h,'Data',gather(cells(xyid)))
+% set(h,'Data',gather(cells(xyid)))
 % set(h2,'Data',[cold(:),cellsT(:)])
-% set(h2,'Data',gather([S_input(:),cold(:)]));
+set(h2,'Data',gather([S_input(:),cold(:)]));
+set(hh,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
 MIN=min(cells(:));
 tl=sprintf([
-    'stepcount=%d \n',...
-    'div=%.2d,\n',...
-    'mean=%.2d ' ,...
-    'min=%.2d max=%.2d \n',...
-    '%s \n'],stepnum,div,mv,MIN,MAX,updateFcn);
+    '%s \n',...
+    'stepcount=%d, div=%.2d,\n',...
+    'mean=%.2d ,min=%.2d max=%.2d \n'],...
+    updateFcn,stepnum,div,mv,MIN,MAX);
 % set(gca,'Title','1')
-title(gca,tl)
+title(fi.Parent,tl)
 drawnow
 if record
 im=frame2im(getframe(fi.Parent.Parent));
 [imind,cm]=rgb2ind(im,256);
 
+gifdir=['../data/' gifname '.gif'];
 if stepnum==intl;
-    imwrite(imind,cm,[gifname '.gif'],'gif','Loopcount',inf,'DelayTime',0.05);
+    imwrite(imind,cm,gifdir,'gif','Loopcount',inf,'DelayTime',0.05);
 else
-    imwrite(imind,cm,[gifname '.gif'],'gif','WriteMode','append','DelayTime',0.05);
+    imwrite(imind,cm,gifdir,'gif','WriteMode','append','DelayTime',0.05);
 end
 end
 pause(0.01)
