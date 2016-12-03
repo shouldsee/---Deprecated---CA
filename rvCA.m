@@ -30,7 +30,7 @@ if randrule
 getrule;
 end
 
-n=300;
+n=200;
 x=2:n+1;
 y=2:n+1;
 if randcell
@@ -284,12 +284,19 @@ mv=mean(cells(:));
 ck0=eye(n,n);
 figure(1)
 % cells=rand(n+2,n+2)+0.1;
+try
+    b0=get(b,'Value');
+    a0=get(a,'Value');
+catch
+    b0=0.5;
+    a0=0.5;
+end
 b = uicontrol('Style','slider','Min',-3,'Max',3,...
-                'SliderStep',[0.01 0.01],'Value',get(b,'Value'),...
+                'SliderStep',[0.01 0.01],'Value',b0,...
                 'Position',[60 20 200 20],...
                 'CallBack',@(hObj,eventdata) get(hObj,'Value'));
 a = uicontrol('Style','slider','Min',-3,'Max',3,...
-                'SliderStep',[0.01 0.01],'Value',get(a,'Value'),...
+                'SliderStep',[0.01 0.01],'Value',a0,...
                 'Position',[60 40 200 20],...
                 'CallBack',@(hObj,eventdata) get(hObj,'Value'));
             
@@ -335,7 +342,7 @@ set(fi,'CData',gather(cells(xyid)'))
 % set(h,'Data',gather(cells(xyid)))
 % set(h2,'Data',[cold(:),cellsT(:)])
 set(h2,'Data',gather([S_input(:),cold(:)]));
-set(hh,'Data',gather([S_input(:),cold(:)]));
+% set(hh,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
 MIN=min(cells(:));
