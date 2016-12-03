@@ -84,7 +84,9 @@ if ~exist('stepmax','var')
 end
     stepnum=1;
 
+    if ~exist('div','var')
 div=1E80;
+    end
 f1='Sinput(xyid)=mod(Sinput(xyid),px)./py;';
 f2='Sinput(xyid)=cos(Sinput(xyid)./px)./py;';
 ef1='eval(f1);';
@@ -284,43 +286,19 @@ mv=mean(cells(:));
 ck0=eye(n,n);
 figure(1)
 % cells=rand(n+2,n+2)+0.1;
-try
-    b0=get(b,'Value');
-    a0=get(a,'Value');
-catch
-    b0=0.5;
-    a0=0.5;
-end
-b = uicontrol('Style','slider','Min',-3,'Max',3,...
-                'SliderStep',[0.01 0.01],'Value',b0,...
-                'Position',[60 20 200 20],...
-                'CallBack',@(hObj,eventdata) get(hObj,'Value'));
-a = uicontrol('Style','slider','Min',-3,'Max',3,...
-                'SliderStep',[0.01 0.01],'Value',a0,...
-                'Position',[60 40 200 20],...
-                'CallBack',@(hObj,eventdata) get(hObj,'Value'));
-            
-bnumber = uicontrol('style','text', ...
-    'string','1', ...
-   'fontsize',12, ...
-   'position',[0,20,50,20],...
-   'string','0.5');
-            
-anumber = uicontrol('style','text', ...
-    'string','1', ...
-   'fontsize',12, ...
-   'position',[0,40,50,20],...
-   'string','0.5');
+figure(1)
+make_slider
 for stepnum=1:stepmax
     %%
-    anow=get(a,'Value');
-    bnow=get(b,'Value');
-    set(anumber,'string',num2str(anow,3))
-    set(bnumber,'string',num2str(bnow,3))
-    wrap1=@(cells,Sinput) mod(Sinput,1)./bnow+mod(cells,1)/anow;
-    braid
     pr=rand(n,n);
-% cells=floor(div*cells)/div;
+    arun=get(a,'Value');
+    brun=get(b,'Value');
+cells=floor(div*cells)/div;
+    set(anumber,'string',num2str(arun,3))
+    set(bnumber,'string',num2str(brun,3))
+wrap1=@(cells,Sinput)mod(cells,1)/arun+mod(Sinput,1)./brun;
+braid
+
 cold=gather(cells(xyid));
 
 % S_inputold=S_input;
@@ -356,6 +334,11 @@ tl=sprintf([
     updateFcn,stepnum,div,mv,MIN,MAX);
 % set(gca,'Title','1')
 title(fi.Parent,tl)
+[gx,gy,rg]=inject(wrap1);
+o=wrap1(gx,gy);
+set(ss,'XData',gx,'YData',gy,'ZData',o,'CData',o);
+set(sid,'XData',gx,'YData',gy,'ZData',gx,'CData',gx);
+
 drawnow
 if record
 im=frame2im(getframe(fi.Parent.Parent));
