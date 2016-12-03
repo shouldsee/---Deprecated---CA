@@ -341,7 +341,10 @@ set(fi,'CData',gather(cells(xyid)'))
 % set(fi,'CData',stdfilt(cells(xyid))');
 % set(h,'Data',gather(cells(xyid)))
 % set(h2,'Data',[cold(:),cellsT(:)])
-set(h2,'Data',gather([S_input(:),cold(:)]));
+xedge=linspace(min(S_input(:)),max(S_input(:)),50);
+yedge=linspace(min(cold(:)),max(cold(:)),50);
+
+set(h2,'Data',gather([S_input(:),cold(:)]),'XBinEdges',xedge,'YBinEdges',yedge);
 % set(hh,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
