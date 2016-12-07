@@ -297,7 +297,7 @@ cells=floor(div*cells)/div;
     set(anumber,'string',num2str(arun,3))
     set(bnumber,'string',num2str(brun,3))
 wrap1=@(cells,Sinput)mod(cells,1)/arun+mod(Sinput,1)./brun;
-braid
+% braid
 
 cold=gather(cells(xyid));
 
@@ -322,7 +322,7 @@ set(fi,'CData',gather(cells(xyid)'))
 xedge=linspace(min(S_input(:)),max(S_input(:)),50);
 yedge=linspace(min(cold(:)),max(cold(:)),50);
 
-set(h2,'Data',gather([S_input(:),cold(:)]),'XBinEdges',xedge,'YBinEdges',yedge);
+% set(h2,'Data',gather([S_input(:),cold(:)]),'XBinEdges',xedge,'YBinEdges',yedge);
 % set(hh,'Data',gather([S_input(:),cold(:)]));
 mv=mean(cells(:));
 MAX=max(cells(:));
@@ -336,8 +336,8 @@ tl=sprintf([
 title(fi.Parent,tl)
 [gx,gy,rg]=inject(wrap1);
 o=wrap1(gx,gy);
-set(ss,'XData',gx,'YData',gy,'ZData',o,'CData',o);
-set(sid,'XData',gx,'YData',gy,'ZData',gx,'CData',gx);
+% set(ss,'XData',gx,'YData',gy,'ZData',o,'CData',o);
+% set(sid,'XData',gx,'YData',gy,'ZData',gx,'CData',gx);
 
 drawnow
 if record
