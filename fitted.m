@@ -40,7 +40,7 @@ while true
    wrap1=@(cells,Sinput) mod(Sinput+bnow,1)./ppx+mod(cells,1)/ppy;
 
 braid
-set(hh,'Data',[S_input cold(:)]);
+% set(hh,'Data',[S_input cold(:)]);
 drawnow
 pause(0.2)
 
