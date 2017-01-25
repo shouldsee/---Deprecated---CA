@@ -1,0 +1,21 @@
+
+function[cells]=iterbasebase(cells,cell2transi,async)
+
+cells=torus(cells);
+
+
+%% generate transition prob.
+transi=cell2transi(cells);
+% S_input=conv2((cells-0.5)*2,FIR,'same');
+
+
+%% select cells for dicriminative update
+    
+    uind=rand(size(cells))>async;
+    if me(async)=
+    pmat=rand(size(uind));
+    cells(uind)=cells(uind).*transi(uind)+(1-cells(uind)).*(transi(uind)>pmat);
+%     proj(S_input(uind)+1)>pmat;
+
+
+end

@@ -1,4 +1,5 @@
-function[rule]=name2rule(str);
+function[rule]=str2rule(str);
+
 s=strsplit(str,'/');
 Bnum=str2num(strip(s{1},'B')')';
 Snum=str2num(strip(s{2},'S')')';

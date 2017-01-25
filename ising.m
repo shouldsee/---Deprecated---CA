@@ -8,7 +8,7 @@ brun=0;
 % getrule
 init_CA
 figure(3)
-beta0=linspace(-5,5,n+2)/4;
+beta0=linspace(-5,5,n+2)/1;
 bmat=repmat(1./beta0',1,n+2);
 b = uicontrol('Style','slider','Min',min(beta0),'Max',max(beta0),...
                 'SliderStep',diff(beta0(1:3)),'Value',beta0(1),...
@@ -49,7 +49,7 @@ while true;
         drawnow
         brun=1/get(b,'Value');
         intl=ceil(get(intel,'Value'));
-        fprintf('beta=%.2f, stepnum=%d, energy=%.3d, mag=%.3d \n',get(b,'Value'),stepnum,mean(avg(:).*cells(:)),mean(cells(:)));
+        fprintf('beta=%.2f, stepnum=%d, energy=%.3d, mag=%.3d \n',brun,stepnum,mean(avg(:).*cells(:)),mean(cells(:)));
     end
     id=randi([1 prod(siz)],[1,2]);
     [xi,yi]=ind2sub(siz,id);
